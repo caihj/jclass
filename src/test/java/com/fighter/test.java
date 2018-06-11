@@ -1,6 +1,7 @@
 package com.fighter;
 
 
+import com.fighter.tools.ClassObject;
 import com.fighter.tools.ClassReader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,8 @@ public class test {
     @Test
     public void testOne() throws IOException {
 
-        ClassReader.readClass("com.fighter.template.Basic".replace(".","/"));
+        ClassObject object = ClassReader.readClass("com.fighter.template.Basic".replace(".","/"));
+
+        System.out.println(object);
     }
 }

@@ -1,7 +1,9 @@
 package com.fighter.tools;
 
 import com.fighter.tools.types.AttributeInfo;
-import com.fighter.tools.types.CpInfo;
+import com.fighter.tools.types.Utils;
+import com.fighter.tools.types.cpinfo.ClassInfo;
+import com.fighter.tools.types.cpinfo.CpInfo;
 import com.fighter.tools.types.FieldInfo;
 import com.fighter.tools.types.MethodInfo;
 
@@ -39,5 +41,40 @@ public class ClassObject {
     //array attributes_count
     public AttributeInfo[]  attributes;
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
 
+        ClassInfo classInfo = null;
+        classInfo = (ClassInfo) constant_pool[this_class];
+
+        sb.append("class Name:"+ Utils.classAccessFlags(access_flags)+constant_pool[classInfo.name_index].toString().replace("/","."));
+        sb.append("\n");
+
+        sb.append("field:\n");
+        for(int i=0;i<fields_count;i++){
+            sb.append("\t");
+            sb.append(Utils.fieldAccessFlags(fields[i].access_flags) + constant_pool[fields[i].descriptor_index] + constant_pool[fields[i].name_index].toString()+"\n");
+        }
+
+        sb.append("method:\n");
+        for(int i=0;i<methods_count;i++){
+            sb.append("\t");
+            sb.append(Utils.fieldAccessFlags(methods[i].access_flags) + constant_pool[methods[i].descriptor_index] + constant_pool[methods[i].name_index].toString());
+            sb.append("\t\t");
+            for(int j=0;j<methods[i].attributes_count;j++){
+                AttributeInfo attr=methods[i].attributes[j];
+                String attrName = constant_pool[attr.attribute_name_index].toString();
+                sb.append("\t\t"+attrName+",");
+                if(attrName.equals("Code")){
+
+                }
+            }
+            sb.append("\n");
+        }
+
+
+
+        return sb.toString();
+    }
 }
