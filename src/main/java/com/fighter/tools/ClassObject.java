@@ -67,7 +67,7 @@ public class ClassObject {
                 String attrName = constant_pool[attr.attribute_name_index].toString();
                 sb.append("\t\t"+attrName+",");
                 if(attrName.equals("Code")){
-
+                    sb.append("\t\tcode length:"+attr.attrubute_length);
                 }
             }
             sb.append("\n");

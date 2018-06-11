@@ -2,12 +2,16 @@ package com.fighter.template;
 
 public final class Basic {
 
-    private String attr1;
+    private volatile String attr1;
 
-    private String attr2;
+    private volatile String attr2;
 
+    public Basic(){
+
+    }
 
     public void print(){
+        int a=3;
         System.out.println(attr1);
         System.out.println(attr2);
     }
