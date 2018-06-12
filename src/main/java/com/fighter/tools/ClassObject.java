@@ -54,7 +54,7 @@ public class ClassObject {
         sb.append("field:\n");
         for(int i=0;i<fields_count;i++){
             sb.append("\t");
-            sb.append(Utils.fieldAccessFlags(fields[i].access_flags) + constant_pool[fields[i].descriptor_index] + constant_pool[fields[i].name_index].toString());
+            sb.append(Utils.fieldAccessFlags(fields[i].access_flags) + constant_pool[fields[i].descriptor_index] +" " +constant_pool[fields[i].name_index].toString());
 
             for(int j=0;j<fields[i].attributes_count;j++){
                 AttributeInfo attr=methods[i].attributes[j];
@@ -74,9 +74,9 @@ public class ClassObject {
                 AttributeInfo attr=methods[i].attributes[j];
                 String attrName = constant_pool[attr.attribute_name_index].toString();
                 sb.append("\t\t"+attrName+",");
-                if(attrName.equals("Code")){
-                    sb.append("\t\tcode length:"+attr.attrubute_length);
-                }
+                sb.append("\t\tlength:"+attr.attrubute_length);
+                sb.append("\t\t"+attr.toString());
+
             }
             sb.append("\n");
         }

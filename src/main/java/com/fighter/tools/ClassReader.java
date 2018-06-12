@@ -4,6 +4,7 @@ import com.fighter.tools.types.AttributeInfo;
 import com.fighter.tools.types.FieldInfo;
 import com.fighter.tools.types.MethodInfo;
 import com.fighter.tools.types.Utils;
+import com.fighter.tools.types.attribute.AttributeFactory;
 import com.fighter.tools.types.cpinfo.CpInfo;
 import com.sun.jndi.toolkit.url.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 
 @Slf4j
@@ -59,12 +61,16 @@ public class ClassReader {
         cls.methods = new MethodInfo[cls.methods_count];
         for(int i=0;i<cls.methods_count;i++){
             cls.methods[i] = readMethod(input);
+            for(int j=0;j<cls.methods[i].attributes.length;j++){
+                cls.methods[i].attributes[j] = AttributeFactory.convertAttribute(cls.methods[i].attributes[j],cls);
+            }
         }
 
         cls.attributes_count = input.readUnsignedShort();
         cls.attributes = new AttributeInfo[cls.attributes_count];
         for(int i=0;i<cls.attributes_count;i++){
             cls.attributes[i] = readAttribute(input);
+            cls.attributes[i] = AttributeFactory.convertAttribute(cls.attributes[i],cls);
         }
 
         return cls;

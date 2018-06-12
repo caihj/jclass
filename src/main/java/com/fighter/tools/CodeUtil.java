@@ -5,7 +5,8 @@ package com.fighter.tools;
  */
 public class CodeUtil {
 
-    public static String byteCodeToList(byte []  code){
+    public static String byteCodeToList(byte []  code,ClassObject cls){
+
 
 
         return "";
