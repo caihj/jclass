@@ -2,7 +2,7 @@ package com.fighter.template;
 
 public final class Basic {
 
-    private volatile String attr1;
+    private volatile String attr1="sss";
 
     private volatile String attr2;
 
