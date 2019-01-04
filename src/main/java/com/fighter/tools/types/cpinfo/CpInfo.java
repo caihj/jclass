@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.DataInput;
 import java.io.IOException;
 
+/**
+ * constant pool info class
+ */
 @Slf4j
 public class CpInfo {
     //u1

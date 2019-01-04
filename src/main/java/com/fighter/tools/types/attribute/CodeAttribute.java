@@ -1,5 +1,6 @@
 package com.fighter.tools.types.attribute;
 
+import com.fighter.tools.ClassObject;
 import com.fighter.tools.ClassReader;
 import com.fighter.tools.types.AttributeInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import java.util.Arrays;
 @Slf4j
 public class CodeAttribute extends AttributeInfo {
 
-    public CodeAttribute(AttributeInfo info){
+    public CodeAttribute(AttributeInfo info, ClassObject cls){
         this.attribute_name_index = info.attribute_name_index;
         this.attrubute_length = info.attrubute_length;
 

@@ -14,7 +14,9 @@ public class AttributeFactory {
         String attributeName  = cls.constant_pool[attributeInfo.attribute_name_index].toString();
 
         switch (attributeName){
-            case "Code":return new  CodeAttribute(attributeInfo);
+            case "Code":return new  CodeAttribute(attributeInfo, cls);
+			case "SourceFile":return new SourceFileAttribute(attributeInfo, cls);
+            case "ConstantValue":return new ConstantValueAttribute(attributeInfo, cls);
             default:
                 log.info("unrecognized attribute:"+attributeName);
                 return attributeInfo;

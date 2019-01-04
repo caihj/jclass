@@ -1,7 +1,11 @@
 package com.fighter.tools;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import com.fighter.tools.types.AttributeInfo;
 import com.fighter.tools.types.Utils;
+import com.fighter.tools.types.attribute.SourceFileAttribute;
 import com.fighter.tools.types.cpinfo.ClassInfo;
 import com.fighter.tools.types.cpinfo.CpInfo;
 import com.fighter.tools.types.FieldInfo;
@@ -51,6 +55,10 @@ public class ClassObject {
         sb.append("class Name:"+ Utils.classAccessFlags(access_flags)+constant_pool[classInfo.name_index].toString().replace("/","."));
         sb.append("\n");
 
+        for (AttributeInfo attribute : attributes) {
+            sb.append("attr :" + attribute.toString() + "\n");
+        }
+
         sb.append("field:\n");
         for(int i=0;i<fields_count;i++){
             sb.append("\t");
@@ -80,8 +88,6 @@ public class ClassObject {
             }
             sb.append("\n");
         }
-
-
 
         return sb.toString();
     }

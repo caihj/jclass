@@ -6,13 +6,11 @@ import com.fighter.tools.types.MethodInfo;
 import com.fighter.tools.types.Utils;
 import com.fighter.tools.types.attribute.AttributeFactory;
 import com.fighter.tools.types.cpinfo.CpInfo;
-import com.sun.jndi.toolkit.url.UrlUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 
 @Slf4j
@@ -20,6 +18,7 @@ public class ClassReader {
 
     public static ClassObject readClass(String className) throws IOException {
 
+        className = className.replace(".","/");
         log.info("start");
         DataInput input = new DataInputStream(ClassReader.class.getResourceAsStream("/"+className+".class"));
 
@@ -30,7 +29,7 @@ public class ClassReader {
         cls.mior_version = input.readUnsignedShort();
         cls.major_version = input.readUnsignedShort();
         cls.constant_pool_count = input.readUnsignedShort();
-        log.info("major version:{} mior_version:{},constant_pool:{}",cls.major_version,cls.mior_version,cls.constant_pool_count);
+        log.info("major version:{} minor_version:{},constant_pool:{}",cls.major_version,cls.mior_version,cls.constant_pool_count);
         cls.constant_pool = new CpInfo[cls.constant_pool_count];
         for(int i=1;i<=cls.constant_pool_count-1;i++){
             cls.constant_pool[i] = CpInfo.read(input);
@@ -54,7 +53,7 @@ public class ClassReader {
         cls.fields_count = input.readUnsignedShort();
         cls.fields = new FieldInfo[cls.fields_count];
         for(int i=0;i<cls.fields_count;i++){
-            cls.fields[i] = readField(input);
+            cls.fields[i] = readField(input, cls);
         }
 
         cls.methods_count  = input.readUnsignedShort();
@@ -62,7 +61,7 @@ public class ClassReader {
         for(int i=0;i<cls.methods_count;i++){
             cls.methods[i] = readMethod(input);
             for(int j=0;j<cls.methods[i].attributes.length;j++){
-                cls.methods[i].attributes[j] = AttributeFactory.convertAttribute(cls.methods[i].attributes[j],cls);
+                cls.methods[i].attributes[j] = AttributeFactory.convertAttribute(cls.methods[i].attributes[j], cls);
             }
         }
 
@@ -76,7 +75,7 @@ public class ClassReader {
         return cls;
     }
 
-    public static FieldInfo readField(DataInput input){
+    public static FieldInfo readField(DataInput input , ClassObject cls){
         FieldInfo info = new FieldInfo();
 
         try {
@@ -88,6 +87,7 @@ public class ClassReader {
 
             for(int i=0;i< info.attributes_count;i++){
                 info.attributes[i] = readAttribute(input);
+                info.attributes[i] = AttributeFactory.convertAttribute(info.attributes[i],cls);
             }
 
         } catch (IOException e) {

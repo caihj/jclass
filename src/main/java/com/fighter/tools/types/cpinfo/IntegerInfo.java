@@ -8,11 +8,12 @@ import java.io.IOException;
  */
 public class IntegerInfo extends CpInfo {
     //u4
-    int bytes;
+    public int value;
+
     public IntegerInfo(int tag, DataInput in) {
         super(tag);
         try {
-            bytes = in.readInt();
+            value = in.readInt();
         } catch (IOException e) {
             e.printStackTrace();
         }
