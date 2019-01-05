@@ -11,10 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ObjectOop extends Oop {
 
-	private Klass klass;
+	public Klass klass;
 
 	//instance field.
-	private Oop [] field;
+	public Oop [] field;
 
 	@Override
 	public void putField(String fieldName, Oop oop) {

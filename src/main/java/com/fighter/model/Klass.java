@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.fighter.classloader.ClassLoader;
 import com.fighter.model.oopimpl.IntegerOop;
+import com.fighter.model.oopimpl.ObjectOop;
 import com.fighter.tools.ClassObject;
 import com.fighter.tools.types.AttributeInfo;
 import com.fighter.tools.types.FieldInfo;
@@ -15,11 +16,14 @@ import com.fighter.tools.types.Utils;
 import com.fighter.tools.types.attribute.ConstantValueAttribute;
 import com.fighter.tools.types.cpinfo.ClassInfo;
 import com.fighter.tools.types.cpinfo.IntegerInfo;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by caihaijun@navercorp.com on 2019/1/3.
  *表示所有已经加载的class。
  */
+
+@Slf4j
 public class Klass {
 
 	private ClassObject readClass;
@@ -133,7 +137,13 @@ public class Klass {
 
 	public Oop newInstance(){
 
-		return null;
+		log.info("new Instance of {}", className);
+
+		ObjectOop objectOop = new ObjectOop();
+		objectOop.klass = this;
+		objectOop.field = new Oop[OopfieldOffsetMap.size()];
+
+		return objectOop;
 	}
 
 	public ClassObject getReadClass() {

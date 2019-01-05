@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fighter.classloader.BootStrapClassLoader;
 import com.fighter.constant.ClassName;
+import com.fighter.constant.Constant;
 import com.fighter.model.Klass;
 import com.fighter.model.Method;
 import com.fighter.model.Oop;
@@ -46,7 +47,7 @@ public class VM {
 		Method method = klass.getMethod(methodName, description);
 
 		if( method == null ){
-			log.error("main method not found " + className);
+			log.error(" method not found " + className);
 			return;
 		}
 
@@ -63,6 +64,10 @@ public class VM {
 		executeEngine.execute(frame, this);
 	}
 
+	void executeMethod(Oop oop, String methodName, String description) {
+
+	}
+
 	public Oop getStaticFiled(String className, String fieldName, String description) {
 		Klass klass = bootStrapClassLoader.loadClass(className);
 		return 	klass.getStaticField(fieldName, description);
@@ -70,6 +75,13 @@ public class VM {
 
 	public Oop newInstance(String className) {
 		Klass klass = bootStrapClassLoader.loadClass(className);
-		return 	klass.newInstance();
+
+		Oop oop = klass.newInstance();
+		//call clinit
+		executeMethod(className, Constant.CINIT, Constant.descripton);
+		//call init
+		executeMethod(oop, Constant.INIT, Constant.descripton);
+
+		return oop;
 	}
 }
