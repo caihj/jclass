@@ -6,6 +6,8 @@ import com.fighter.tools.types.MethodInfo;
 import com.fighter.tools.types.Utils;
 import com.fighter.tools.types.attribute.AttributeFactory;
 import com.fighter.tools.types.cpinfo.CpInfo;
+import com.fighter.tools.types.cpinfo.DoubleInfo;
+import com.fighter.tools.types.cpinfo.LongInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInput;
@@ -17,7 +19,7 @@ import java.io.IOException;
 public class ClassReader {
 
     public static ClassObject readClass(String className) throws IOException {
-
+        log.info("read class "+ className);
         className = className.replace(".","/");
         log.info("start");
         DataInput input = new DataInputStream(ClassReader.class.getResourceAsStream("/"+className+".class"));
@@ -33,6 +35,10 @@ public class ClassReader {
         cls.constant_pool = new CpInfo[cls.constant_pool_count];
         for(int i=1;i<=cls.constant_pool_count-1;i++){
             cls.constant_pool[i] = CpInfo.read(input);
+            //long，double  要跳一个下标,占用两个格子
+            if( cls.constant_pool[i] instanceof LongInfo ||  cls.constant_pool[i] instanceof DoubleInfo) {
+                i++;
+            }
         }
         log.info("read constant pool complement");
 

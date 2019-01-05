@@ -21,6 +21,7 @@ public class Method {
 	public Method(MethodInfo method, ClassObject readClass) {
 		name = readClass.constant_pool[method.name_index].toString();
 		descriptor = readClass.constant_pool[method.descriptor_index].toString();
+		accessFlags = method.access_flags;
 
 		for(int j=0;j<method.attributes_count;j++){
 			AttributeInfo attr = method.attributes[j];

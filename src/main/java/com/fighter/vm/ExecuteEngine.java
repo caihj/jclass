@@ -4,6 +4,12 @@ import static com.fighter.constant.Instruct.*;
 
 import java.util.Stack;
 
+import com.fighter.model.Klass;
+import com.fighter.model.Oop;
+import com.fighter.tools.types.cpinfo.ClassInfo;
+import com.fighter.tools.types.cpinfo.CpInfo;
+import com.fighter.tools.types.cpinfo.FieldRefInfo;
+import com.fighter.tools.types.cpinfo.NameAndTypeInfo;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,11 +20,13 @@ public class ExecuteEngine {
 	//top frame is current running frame
 	private Stack<Frame> frameStack = new Stack<>();
 
-	public void execute(Frame frame) {
+	public void execute(Frame frame, VM vm) {
 		//
 		frameStack.push(frame);
 
 		byte[] codeArray = frame.currentMethod.codeAttribute.code;
+		Klass currentKlass = frame.currentKlass;
+		CpInfo [] constant_pool = currentKlass.getReadClass().constant_pool;
 
 		while ( frame.pc < codeArray.length ) {
 			int code = codeArray[frame.pc] & 0xff;
@@ -258,25 +266,47 @@ public class ExecuteEngine {
 				case fstore: {
 				}
 				break;
+
 				case fstore_0: {
 				}
 				break;
+
 				case fstore_1: {
 				}
 				break;
+
 				case fstore_2: {
 				}
 				break;
+
 				case fstore_3: {
 				}
 				break;
+
 				case fsub: {
 				}
 				break;
+
 				case getfield: {
 				}
 				break;
+
 				case getstatic: {
+
+					int index1 = codeArray[++frame.pc] & 0xff;
+					int index2 = codeArray[++frame.pc] & 0xff;
+					int index = ( index1 << 8 ) + index2;
+
+					CpInfo fieldRef = constant_pool[index];
+					assert fieldRef instanceof FieldRefInfo;
+					FieldRefInfo fieldRefInfo = (FieldRefInfo)fieldRef;
+
+					String className = constant_pool[((ClassInfo)constant_pool[fieldRefInfo.class_index]).name_index].toString();
+					String fieldName =  constant_pool[((NameAndTypeInfo)constant_pool[fieldRefInfo.name_and_type_index]).name_index].toString();
+					String description =  constant_pool[((NameAndTypeInfo)constant_pool[fieldRefInfo.name_and_type_index]).descriptor_index].toString();
+
+					Oop value = vm.getStaticFiled(className, fieldName, description);
+					frame.opStack.push(value);
 				}
 				break;
 				case i_goto: {
@@ -595,6 +625,13 @@ public class ExecuteEngine {
 				}
 				break;
 				case i_new: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					int index2 = codeArray[++frame.pc] & 0xff;
+					int index = ( index1 << 8 ) + index2;
+
+					String className = constant_pool[((ClassInfo)constant_pool[index]).name_index].toString();
+					Oop oop = vm.newInstance(className);
+					frame.opStack.push(oop);
 				}
 				break;
 				case newarray: {

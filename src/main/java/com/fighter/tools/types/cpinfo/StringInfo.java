@@ -9,6 +9,7 @@ import java.io.IOException;
 public class StringInfo extends CpInfo {
     //u2
     public int string_index;
+
     public StringInfo(int tag, DataInput in) {
         super(tag);
         try {

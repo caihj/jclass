@@ -20,11 +20,25 @@ public class BootStrapClassLoader implements ClassLoader{
 
 	public ConcurrentHashMap<String, Klass> loadClass = new ConcurrentHashMap<>();
 
-	public Klass loadClass(String className) {
+
+	public  Klass loadClass(String className) {
+
+		Klass klass = loadClass.get(className);
+		if( klass!=null ){
+			return klass;
+		}
+
+		klass =  doLoadClass(className);
+		loadClass.put(className, klass);
+		return klass;
+	}
+
+
+	private Klass doLoadClass(String className)  {
 
 		try {
 			ClassObject obj = ClassReader.readClass(className);
-			Klass klass = new Klass(obj, this);
+			Klass klass = new Klass(obj,className, this);
 
 			LinkedList superInterfaceList = new LinkedList();
 
@@ -54,7 +68,6 @@ public class BootStrapClassLoader implements ClassLoader{
 		} catch (IOException e) {
 			log.info(e.getMessage(), e);
 		}
-
 		return null;
 	}
 }

@@ -6,8 +6,10 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fighter.classloader.BootStrapClassLoader;
+import com.fighter.constant.ClassName;
 import com.fighter.model.Klass;
 import com.fighter.model.Method;
+import com.fighter.model.Oop;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,24 +25,28 @@ public class VM {
 	public  ExecuteEngine executeEngine = new ExecuteEngine();
 
 	public void loadSomeUsefulClass() {
-
+		executeMethod(ClassName.SYSTEM, "initializeSystemClass", "()V");
 	}
 
 	public void execute(String mainClass){
 
-		Klass klass = bootStrapClassLoader.loadClass(mainClass);
+		loadSomeUsefulClass();
+		executeMethod(mainClass, "main", "([Ljava/lang/String;)V");
+
+	}
+
+	private void executeMethod(String className, String methodName, String description){
+
+		Klass klass = bootStrapClassLoader.loadClass(className);
 		if (klass == null ){
-			log.error("class not found " + mainClass);
+			log.error("class not found " + className);
 			return;
 		}
 
-
-
-		//find main method
-		Method method = klass.getMethod("main", "([Ljava/lang/String;)V");
+		Method method = klass.getMethod(methodName, description);
 
 		if( method == null ){
-			log.error("main method not found " + mainClass);
+			log.error("main method not found " + className);
 			return;
 		}
 
@@ -51,10 +57,19 @@ public class VM {
 		frame.opStack = new Stack<>();
 		frame.currentMethod = method;
 		frame.pc = 0;
+		frame.currentKlass = klass;
 
 		//execute it
-		executeEngine.execute(frame);
-
+		executeEngine.execute(frame, this);
 	}
 
+	public Oop getStaticFiled(String className, String fieldName, String description) {
+		Klass klass = bootStrapClassLoader.loadClass(className);
+		return 	klass.getStaticField(fieldName, description);
+	}
+
+	public Oop newInstance(String className) {
+		Klass klass = bootStrapClassLoader.loadClass(className);
+		return 	klass.newInstance();
+	}
 }

@@ -2,12 +2,10 @@ package com.fighter.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.fighter.classloader.ClassLoader;
-import com.fighter.constant.ClassName;
 import com.fighter.model.oopimpl.IntegerOop;
 import com.fighter.tools.ClassObject;
 import com.fighter.tools.types.AttributeInfo;
@@ -29,6 +27,8 @@ public class Klass {
 	//class loader load this class.
 	private ClassLoader classloader ;
 
+	private String className;
+
 	private Map<String, Integer> OopfieldOffsetMap;
 
 	//private Map<String, Integer > staticField;
@@ -41,8 +41,9 @@ public class Klass {
 
 	private List<Klass> superInterface;
 
-	public Klass(ClassObject obj, ClassLoader classloader) {
+	public Klass(ClassObject obj, String className, ClassLoader classloader) {
 		readClass = obj;
+		this.className = className;
 		this.classloader = classloader;
 	}
 
@@ -135,4 +136,11 @@ public class Klass {
 		return null;
 	}
 
+	public ClassObject getReadClass() {
+		return readClass;
+	}
+
+	public Oop getStaticField(String fieldName, String description) {
+		return staticFieldvalue.get(fieldName + description);
+	}
 }

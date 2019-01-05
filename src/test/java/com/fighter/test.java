@@ -49,6 +49,14 @@ public class test {
     }
 
     @Test
+    public void readProperties() throws IOException {
+
+        ClassObject object = ClassReader.readClass("java/util/Properties");
+
+        System.out.println(object);
+    }
+
+    @Test
     public void testStatic(){
 
         BasicFoo foo = new BasicFoo();

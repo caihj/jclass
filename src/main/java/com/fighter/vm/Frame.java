@@ -3,6 +3,7 @@ package com.fighter.vm;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import com.fighter.model.Klass;
 import com.fighter.model.Method;
 import com.fighter.model.Oop;
 
@@ -21,5 +22,7 @@ public class Frame {
 	public int pc;
 
 	public Method currentMethod;
+
+	public Klass currentKlass;
 
 }

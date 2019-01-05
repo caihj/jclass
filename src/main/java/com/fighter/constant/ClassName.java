@@ -6,4 +6,6 @@ package com.fighter.constant;
 public class ClassName {
 
 	public static final String INTEGER_TYPE = "java.lang.Integer";
+
+	public static final String SYSTEM = "java.lang.System";
 }
