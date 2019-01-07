@@ -6,7 +6,7 @@ import com.fighter.model.Oop;
 /**
  * Created by caihaijun@navercorp.com on 2019/1/7.
  */
-public class DoubleOop extends Oop {
+public class DoubleOop extends BasicOop  {
 
 	private double value;
 

@@ -208,6 +208,7 @@ public class Instruct {
 	public static final int sastore	= 0x56;
 	public static final int sipush	= 0x11;
 	public static final int swap	= 0x5f;
+
 	public static final int tableswitch	= 0xaa;
 	public static final int wide	= 0xc4;
 }

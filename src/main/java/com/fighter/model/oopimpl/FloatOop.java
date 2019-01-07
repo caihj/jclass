@@ -6,7 +6,7 @@ import com.fighter.model.Oop;
 /**
  * Created by caihaijun@navercorp.com on 2019/1/7.
  */
-public class FloatOop extends Oop {
+public class FloatOop extends BasicOop  {
 
 	private float value;
 

@@ -6,13 +6,7 @@ import com.fighter.model.Oop;
 /**
  * Created by caihaijun@navercorp.com on 2019/1/7.
  */
-public class LongOop extends BasicOop  {
-	private long value;
-
-	public LongOop(long value) {
-		this.value = value;
-	}
-
+public class BasicOop extends Oop {
 	@Override
 	public void putField(String fieldName, Oop oop) {
 
@@ -23,7 +17,8 @@ public class LongOop extends BasicOop  {
 		return null;
 	}
 
-	public long getValue() {
-		return value;
+	@Override
+	public Oop getField(String className, String fieldName, String description) {
+		return null;
 	}
 }

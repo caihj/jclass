@@ -6,9 +6,13 @@ import com.fighter.model.Oop;
 /**
  * Created by caihaijun@navercorp.com on 2019/1/7.
  */
-public class ByteOop  extends Oop {
+public class ByteOop  extends BasicOop  {
 
 	private int value;
+
+	public ByteOop(int value) {
+		this.value = (byte)value;
+	}
 
 	public int getValue() {
 		return value;

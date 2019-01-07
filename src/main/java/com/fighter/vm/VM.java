@@ -94,4 +94,8 @@ public class VM {
 	public void checkCast(Oop obj, String className) {
 
 	}
+
+	public int checkInstanceOf(Oop oop, String className) {
+		return 0;
+	}
 }

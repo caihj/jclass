@@ -25,4 +25,9 @@ public class ObjectOop extends Oop {
 	public Klass getKlass() {
 		return klass;
 	}
+
+	@Override
+	public Oop getField(String className, String fieldName, String description) {
+		return null;
+	}
 }

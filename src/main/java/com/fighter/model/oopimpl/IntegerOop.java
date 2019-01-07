@@ -6,7 +6,7 @@ import com.fighter.model.Oop;
 /**
  * Created by caihaijun@navercorp.com on 2019/1/4.
  */
-public class IntegerOop extends Oop {
+public class IntegerOop extends BasicOop  {
 
 	private int value;
 

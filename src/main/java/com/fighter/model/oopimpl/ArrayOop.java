@@ -8,7 +8,7 @@ import com.fighter.model.Oop;
 /**
  * Created by caihaijun@navercorp.com on 2019/1/7.
  */
-public class ArrayOop extends Oop {
+public class ArrayOop extends BasicOop  {
 
 	private LinkedList<Oop> values;
 
