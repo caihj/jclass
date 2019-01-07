@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by caihaijun@navercorp.com on 2019/1/3.
+ * https://cs.au.dk/~mis/dOvs/jvmspec/ref--41.html
  */
 @Slf4j
 public class ExecuteEngine {
