@@ -11,6 +11,8 @@ import com.fighter.constant.Constant;
 import com.fighter.model.Klass;
 import com.fighter.model.Method;
 import com.fighter.model.Oop;
+import com.fighter.model.oopimpl.ArrayOop;
+import com.fighter.model.oopimpl.IntegerOop;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -83,5 +85,13 @@ public class VM {
 		executeMethod(oop, Constant.INIT, Constant.descripton);
 
 		return oop;
+	}
+
+	public ArrayOop newArrayInstance(String className, IntegerOop count) {
+		return null;
+	}
+
+	public void checkCast(Oop obj, String className) {
+
 	}
 }

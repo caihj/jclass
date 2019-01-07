@@ -4,23 +4,23 @@ import com.fighter.model.Klass;
 import com.fighter.model.Oop;
 
 /**
- * Created by caihaijun@navercorp.com on 2019/1/4.
+ * Created by caihaijun@navercorp.com on 2019/1/7.
  */
-public class IntegerOop extends Oop {
+public class FloatOop extends Oop {
 
-	private int value;
+	private float value;
 
-	public IntegerOop(int value) {
+	public FloatOop( float value){
 		this.value = value;
+	}
+
+	public float getValue() {
+		return value;
 	}
 
 	@Override
 	public void putField(String fieldName, Oop oop) {
 
-	}
-
-	public int getValue() {
-		return value;
 	}
 
 	@Override

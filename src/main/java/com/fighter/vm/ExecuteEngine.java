@@ -6,6 +6,12 @@ import java.util.Stack;
 
 import com.fighter.model.Klass;
 import com.fighter.model.Oop;
+import com.fighter.model.oopimpl.ArrayOop;
+import com.fighter.model.oopimpl.CharOop;
+import com.fighter.model.oopimpl.DoubleOop;
+import com.fighter.model.oopimpl.FloatOop;
+import com.fighter.model.oopimpl.IntegerOop;
+import com.fighter.model.oopimpl.LongOop;
 import com.fighter.tools.types.cpinfo.ClassInfo;
 import com.fighter.tools.types.cpinfo.CpInfo;
 import com.fighter.tools.types.cpinfo.FieldRefInfo;
@@ -33,183 +39,391 @@ public class ExecuteEngine {
 			switch (code) {
 
 				case aaload: {
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					frame.opStack.push(arrayOop.getValue(integerOop));
 				}
 				break;
 				case aastore: {
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					Oop value = frame.opStack.pop();
+					arrayOop.setValue(integerOop, value);
 				}
 				break;
 				case aconst_null: {
+					frame.opStack.push(null);
 				}
 				break;
 				case aload: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					frame.opStack.push(frame.localVariable.get(index1));
 				}
 				break;
 				case aload_0: {
+					frame.opStack.push(frame.localVariable.get(0));
 				}
 				break;
 				case aload_1: {
+					frame.opStack.push(frame.localVariable.get(1));
 				}
 				break;
 				case aload_2: {
+					frame.opStack.push(frame.localVariable.get(2));
 				}
 				break;
 				case aload_3: {
+					frame.opStack.push(frame.localVariable.get(3));
 				}
 				break;
 				case anewarray: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					int index2 = codeArray[++frame.pc] & 0xff;
+
+					IntegerOop count = (IntegerOop)frame.opStack.pop();
+
+					int index = ( index1 << 8 ) + index2;
+					String className = constant_pool[((ClassInfo)constant_pool[index]).name_index].toString();
+
+					ArrayOop arrayOop = vm.newArrayInstance(className, count);
+					frame.opStack.push(arrayOop);
 				}
 				break;
 				case areturn: {
+					Oop returnValue = frame.opStack.pop();
+					frameStack.pop();
+					Frame currentFrame = frameStack.peek();
+					currentFrame.opStack.push(returnValue);
 				}
 				break;
 				case arraylength: {
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					IntegerOop integerOop = arrayOop.getSize();
+					frame.opStack.push(integerOop);
 				}
 				break;
 				case astore: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					Oop oop = frame.opStack.pop();
+					frame.localVariable.set(index1, oop);
 				}
 				break;
 				case astore_0: {
+					Oop oop = frame.opStack.pop();
+					frame.localVariable.set(0, oop);
 				}
 				break;
 				case astore_1: {
+					Oop oop = frame.opStack.pop();
+					frame.localVariable.set(1, oop);
 				}
 				break;
 				case astore_2: {
+					Oop oop = frame.opStack.pop();
+					frame.localVariable.set(2, oop);
 				}
 				break;
 				case astore_3: {
+					Oop oop = frame.opStack.pop();
+					frame.localVariable.set(3, oop);
 				}
 				break;
 				case athrow: {
+					Oop oop = frame.opStack.pop();
+					frame.opStack.clear();
+					frame.opStack.push(oop);
 				}
 				break;
 				case baload: {
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					Oop value = arrayOop.getValue(integerOop);
+					frame.opStack.push(value);
 				}
 				break;
 				case bastore: {
+					IntegerOop value = (IntegerOop)frame.opStack.pop();
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					arrayOop.setValue(integerOop, value);
 				}
 				break;
 				case bipush: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					frame.opStack.push(new IntegerOop(index1));
 				}
 				break;
 				case breakpoint: {
 				}
 				break;
 				case caload: {
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					Oop value = arrayOop.getValue(integerOop);
+					frame.opStack.push(value);
 				}
 				break;
 				case castore: {
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					CharOop value = (CharOop)frame.opStack.pop();
+					arrayOop.setValue(integerOop, value);
 				}
 				break;
 				case checkcast: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					int index2 = codeArray[++frame.pc] & 0xff;
+
+					int index = ( index1 << 8 ) + index2;
+					String className = constant_pool[((ClassInfo)constant_pool[index]).name_index].toString();
+
+					Oop obj = frame.opStack.peek();
+					vm.checkCast(obj, className);
+
 				}
 				break;
 				case d2f: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					FloatOop floatOop = new FloatOop((float)doubleOop.getValue());
+					frame.opStack.push(floatOop);
 				}
 				break;
 				case d2i: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					IntegerOop integerOop = new IntegerOop((int)doubleOop.getValue());
+					frame.opStack.push(integerOop);
 				}
 				break;
 				case d2l: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					LongOop longOop = new LongOop((long)doubleOop.getValue());
+					frame.opStack.push(longOop);
 				}
 				break;
 				case dadd: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+					DoubleOop doubleOop2 = (DoubleOop)frame.opStack.pop();
+					frame.opStack.push(new DoubleOop(doubleOop1.getValue() + doubleOop2.getValue()));
 				}
 				break;
 				case daload: {
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					Oop value = arrayOop.getValue(integerOop);
+					frame.opStack.push((DoubleOop)value);
 				}
 				break;
 				case dastore: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					arrayOop.setValue(integerOop, doubleOop);
 				}
 				break;
 				case dcmpg: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+
+					DoubleOop doubleOop2 = (DoubleOop)frame.opStack.pop();
+					if(Double.isNaN(doubleOop2.getValue()) || Double.isNaN(doubleOop1.getValue()) ) {
+						frame.opStack.push(new IntegerOop(1));
+					}  else if(doubleOop2.getValue() > doubleOop1.getValue()) {
+						frame.opStack.push(new IntegerOop(1));
+					} else if(doubleOop2.getValue() == doubleOop1.getValue()) {
+						frame.opStack.push(new IntegerOop(0));
+					} else {
+						frame.opStack.push(new IntegerOop(-1));
+					}
 				}
 				break;
 				case dcmpl: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+					DoubleOop doubleOop2 = (DoubleOop)frame.opStack.pop();
+					if(Double.isNaN(doubleOop2.getValue()) || Double.isNaN(doubleOop1.getValue())) {
+						frame.opStack.push(new IntegerOop(1));
+					} else if(doubleOop2.getValue() > doubleOop1.getValue()) {
+						frame.opStack.push(new IntegerOop(1));
+					} else if(doubleOop2.getValue() == doubleOop1.getValue()) {
+						frame.opStack.push(new IntegerOop(0));
+					} else {
+						frame.opStack.push(new IntegerOop(-1));
+					}
 				}
 				break;
 				case dconst_0: {
+					frame.opStack.push(new DoubleOop(0.0));
 				}
 				break;
 				case dconst_1: {
+					frame.opStack.push(new DoubleOop(1.0));
 				}
 				break;
 				case ddiv: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+					DoubleOop doubleOop2 = (DoubleOop)frame.opStack.pop();
+					frame.opStack.push(new DoubleOop(doubleOop1.getValue()/doubleOop2.getValue()));
 				}
 				break;
 				case dload: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					frame.opStack.push(frame.localVariable.get(index1));
 				}
 				break;
 				case dload_0: {
+					frame.opStack.push(frame.localVariable.get(0));
 				}
 				break;
 				case dload_1: {
+					frame.opStack.push(frame.localVariable.get(1));
 				}
 				break;
 				case dload_2: {
+					frame.opStack.push(frame.localVariable.get(2));
 				}
 				break;
 				case dload_3: {
+					frame.opStack.push(frame.localVariable.get(3));
 				}
 				break;
 				case dmul: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+					DoubleOop doubleOop2 = (DoubleOop)frame.opStack.pop();
+					frame.opStack.push(new DoubleOop(doubleOop1.getValue()*doubleOop2.getValue()));
 				}
 				break;
 				case dneg: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+					frame.opStack.push(new DoubleOop(0 - doubleOop1.getValue()));
 				}
 				break;
 				case drem: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+					DoubleOop doubleOop2 = (DoubleOop)frame.opStack.pop();
+					frame.opStack.push(new DoubleOop(doubleOop1.getValue() % doubleOop2.getValue()));
 				}
 				break;
 				case dreturn: {
+					Oop returnValue = frame.opStack.pop();
+					frameStack.pop();
+					Frame currentFrame = frameStack.peek();
+					currentFrame.opStack.push(returnValue);
 				}
 				break;
 				case dstore: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					frame.localVariable.set(index1, doubleOop);
 				}
 				break;
 				case dstore_0: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					frame.localVariable.set(0, doubleOop);
 				}
 				break;
 				case dstore_1: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					frame.localVariable.set(1, doubleOop);
 				}
 				break;
 				case dstore_2: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					frame.localVariable.set(2, doubleOop);
 				}
 				break;
 				case dstore_3: {
+					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
+					frame.localVariable.set(3, doubleOop);
 				}
 				break;
 				case dsub: {
+					DoubleOop doubleOop1= (DoubleOop)frame.opStack.pop();
+					DoubleOop doubleOop2 = (DoubleOop)frame.opStack.pop();
+					frame.opStack.push(new DoubleOop(doubleOop1.getValue()  - doubleOop2.getValue()));
 				}
 				break;
 				case dup: {
+					frame.opStack.push(frame.opStack.peek());
 				}
 				break;
 				case dup_x1: {
+					Oop oop1 = frame.opStack.pop();
+					Oop oop2 = frame.opStack.pop();
+					frame.opStack.push(oop1);
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
 				}
 				break;
 				case dup_x2: {
+					Oop oop1 = frame.opStack.pop();
+					Oop oop2 = frame.opStack.pop();
+					Oop oop3 = frame.opStack.pop();
+					frame.opStack.push(oop1);
+					frame.opStack.push(oop3);
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
 				}
 				break;
 				case dup2: {
+					Oop oop1 = frame.opStack.pop();
+					Oop oop2 = frame.opStack.pop();
+
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
+
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
 				}
 				break;
 				case dup2_x1: {
+
+					Oop oop1 = frame.opStack.pop();
+					Oop oop2 = frame.opStack.pop();
+					Oop oop3 = frame.opStack.pop();
+
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
+
+					frame.opStack.push(oop3);
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
+
 				}
 				break;
 				case dup2_x2: {
+
+					Oop oop1 = frame.opStack.pop();
+					Oop oop2 = frame.opStack.pop();
+					Oop oop3 = frame.opStack.pop();
+					Oop oop4 = frame.opStack.pop();
+
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
+
+					frame.opStack.push(oop4);
+					frame.opStack.push(oop3);
+					frame.opStack.push(oop2);
+					frame.opStack.push(oop1);
 				}
 				break;
 				case f2d: {
+					FloatOop floatOop = (FloatOop)frame.opStack.pop();
+					frame.opStack.push(new DoubleOop(floatOop.getValue()));
 				}
 				break;
 				case f2i: {
+					FloatOop floatOop = (FloatOop)frame.opStack.pop();
+					frame.opStack.push(new IntegerOop((int)floatOop.getValue()));
 				}
 				break;
 				case f2l: {
+					FloatOop floatOop = (FloatOop)frame.opStack.pop();
+					frame.opStack.push(new LongOop((long)floatOop.getValue()));
 				}
 				break;
 				case fadd: {
+
+					FloatOop floatOop1 = (FloatOop)frame.opStack.pop();
+					FloatOop floatOop2 = (FloatOop)frame.opStack.pop();
+					frame.opStack.push(new FloatOop(floatOop1.getValue() + floatOop2.getValue()));
 				}
 				break;
 				case faload: {

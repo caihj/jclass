@@ -4,13 +4,12 @@ import com.fighter.model.Klass;
 import com.fighter.model.Oop;
 
 /**
- * Created by caihaijun@navercorp.com on 2019/1/4.
+ * Created by caihaijun@navercorp.com on 2019/1/7.
  */
-public class IntegerOop extends Oop {
+public class LongOop extends Oop {
+	private long value;
 
-	private int value;
-
-	public IntegerOop(int value) {
+	public LongOop(long value) {
 		this.value = value;
 	}
 
@@ -19,12 +18,9 @@ public class IntegerOop extends Oop {
 
 	}
 
-	public int getValue() {
-		return value;
-	}
-
 	@Override
 	public Klass getKlass() {
 		return null;
 	}
+
 }
