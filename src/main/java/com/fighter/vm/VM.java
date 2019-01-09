@@ -98,4 +98,38 @@ public class VM {
 	public int checkInstanceOf(Oop oop, String className) {
 		return 0;
 	}
+
+	/**
+	 * new int[3][2], dimArray is [2,3];
+	 * @param className
+	 * @param dimArray
+	 * @return
+	 */
+	public Oop createMultiArray(String className, int[] dimArray) {
+		return null;
+	}
+
+	/**
+	 *
+	 Array Type
+	 Value
+	 boolean 	 4
+	 char 	 5
+	 float 	 6
+	 double  7
+	 byte 	 8
+	 short 	 9
+	 int 	 10
+	 long 	 11
+	 * @param type
+	 * @param value
+	 * @return
+	 */
+
+	public Oop createArray(int type, int value) {
+		return null;
+	}
+
+	public void putStatic(String className, String fieldName, String description, Oop value) {
+	}
 }

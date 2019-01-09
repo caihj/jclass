@@ -6,10 +6,13 @@ package com.fighter.model;
  */
 public abstract class Oop {
 
-
 	public abstract void putField(String fieldName, Oop oop);
 
 	public abstract  Klass getKlass();
 
 	public abstract Oop getField(String className, String fieldName, String description);
+
+	public abstract void lock();
+
+	public abstract void unlock();
 }

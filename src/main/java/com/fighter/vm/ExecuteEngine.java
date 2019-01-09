@@ -2,6 +2,8 @@ package com.fighter.vm;
 
 import static com.fighter.constant.Instruct.*;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Stack;
 
 import com.fighter.model.Klass;
@@ -37,6 +39,8 @@ public class ExecuteEngine {
 		Klass currentKlass = frame.currentKlass;
 		CpInfo [] constant_pool = currentKlass.getReadClass().constant_pool;
 
+		boolean wideFlag = true;
+
 		while ( frame.pc < codeArray.length ) {
 			int code = codeArray[frame.pc] & 0xff;
 			switch (code) {
@@ -60,6 +64,9 @@ public class ExecuteEngine {
 				break;
 				case aload: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					frame.opStack.push(frame.localVariable.get(index1));
 				}
 				break;
@@ -97,8 +104,8 @@ public class ExecuteEngine {
 					frameStack.pop();
 					Frame currentFrame = frameStack.peek();
 					currentFrame.opStack.push(returnValue);
+					return;
 				}
-				break;
 				case arraylength: {
 					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
 					IntegerOop integerOop = arrayOop.getSize();
@@ -107,6 +114,9 @@ public class ExecuteEngine {
 				break;
 				case astore: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					Oop oop = frame.opStack.pop();
 					frame.localVariable.set(index1, oop);
 				}
@@ -182,7 +192,6 @@ public class ExecuteEngine {
 
 					Oop obj = frame.opStack.peek();
 					vm.checkCast(obj, className);
-
 				}
 				break;
 				case d2f: {
@@ -268,6 +277,9 @@ public class ExecuteEngine {
 				break;
 				case dload: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					frame.opStack.push(frame.localVariable.get(index1));
 				}
 				break;
@@ -312,10 +324,13 @@ public class ExecuteEngine {
 					frameStack.pop();
 					Frame currentFrame = frameStack.peek();
 					currentFrame.opStack.push(returnValue);
+					return;
 				}
-				break;
 				case dstore: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					DoubleOop doubleOop = (DoubleOop)frame.opStack.pop();
 					frame.localVariable.set(index1, doubleOop);
 				}
@@ -493,6 +508,9 @@ public class ExecuteEngine {
 				break;
 				case fload: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					frame.opStack.push(frame.opStack.push(frame.localVariable.get(index1)));
 				}
 				break;
@@ -538,10 +556,13 @@ public class ExecuteEngine {
 					frameStack.pop();
 					Frame currentFrame = frameStack.peek();
 					currentFrame.opStack.push(returnValue);
+					return;
 				}
-				break;
 				case fstore: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					FloatOop floatOop1= (FloatOop)frame.opStack.pop();
 					frame.localVariable.set(index1, floatOop1);
 				}
@@ -938,14 +959,25 @@ public class ExecuteEngine {
 				}
 				break;
 				case iinc: {
-					int index1 = codeArray[++frame.pc] & 0xff;
-					int const_value = codeArray[++frame.pc] & 0xff;
+					int index = 0;
+					int const_value = 0;
 
-					IntegerOop old = (IntegerOop)frame.localVariable.get(index1);
+					if(wideFlag){
+						index = codeArray[++frame.pc] & 0xff;
+						const_value = codeArray[++frame.pc];
+					} else {
+						int index1 = codeArray[++frame.pc] & 0xff;
+						int index2 = codeArray[++frame.pc] & 0xff;
+						index = ( index1 << 8 ) + index2;
+						const_value = getOpCodeShort(codeArray, ++frame.pc);
+						frame.pc +=2;
+					}
 
-					frame.localVariable.set(index1, new IntegerOop(old.getValue()+ const_value));
+					IntegerOop old = (IntegerOop)frame.localVariable.get(index);
+
+					frame.localVariable.set(index, new IntegerOop(old.getValue()+ const_value));
+					continue;
 				}
-				break;
 				case iload: {
 					int index1 = codeArray[++frame.pc] & 0xff;
 					frame.opStack.push(frame.localVariable.get(index1));
@@ -1035,8 +1067,8 @@ public class ExecuteEngine {
 					frameStack.pop();
 					Frame currentFrame = frameStack.peek();
 					currentFrame.opStack.push(returnValue);
+					return;
 				}
-				break;
 				case ishl: {
 					IntegerOop integerOop1 = (IntegerOop)frame.opStack.pop();
 					IntegerOop integerOop2 = (IntegerOop)frame.opStack.pop();
@@ -1057,6 +1089,9 @@ public class ExecuteEngine {
 				break;
 				case istore: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					IntegerOop integerOop2 = (IntegerOop)frame.opStack.pop();
 					frame.localVariable.set(index1, integerOop2);
 				}
@@ -1204,6 +1239,9 @@ public class ExecuteEngine {
 				break;
 				case lload: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					frame.opStack.push(frame.localVariable.get(index1));
 				}
 				break;
@@ -1237,6 +1275,34 @@ public class ExecuteEngine {
 				case lookupswitch: {
 					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
 					//need implement
+					int nextInstructPos = frame.pc;
+					//skip padding bytes
+					frame.pc +=4;
+
+					int defaultOffset = getOpCodeInt(codeArray, frame.pc);
+					frame.pc +=4;
+
+					int keySetCount = getOpCodeInt(codeArray, frame.pc);
+					frame.pc +=4;
+					int [] keyArray = new int[keySetCount];
+					int [] offsetArray = new int[keySetCount];
+					for(int i=0; i< keySetCount; i++ ) {
+						keyArray[i] =  getOpCodeInt(codeArray, frame.pc);
+						frame.pc +=4;
+						offsetArray[i] =  getOpCodeInt(codeArray, frame.pc);
+						frame.pc +=4;
+					}
+
+					int pos = Arrays.binarySearch(keyArray, integerOop.getValue());
+					if(pos >=0 ){
+						//found
+						nextInstructPos = nextInstructPos + offsetArray[pos];
+					} else {
+						//not found
+						nextInstructPos = nextInstructPos + defaultOffset;
+					}
+
+					frame.pc = nextInstructPos;
 
 				}
 				break;
@@ -1259,8 +1325,8 @@ public class ExecuteEngine {
 					frameStack.pop();
 					Frame currentFrame = frameStack.peek();
 					currentFrame.opStack.push(returnValue);
+					return;
 				}
-				break;
 				case lshl: {
 					IntegerOop longOop1 = (IntegerOop)frame.opStack.pop();
 					LongOop longOop2 = (LongOop)frame.opStack.pop();
@@ -1281,6 +1347,9 @@ public class ExecuteEngine {
 				break;
 				case lstore: {
 					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
 					LongOop longOop = (LongOop)frame.opStack.pop();
 					frame.localVariable.set(index1, longOop);
 				}
@@ -1306,21 +1375,60 @@ public class ExecuteEngine {
 				}
 				break;
 				case lsub: {
+					LongOop longOop1 = (LongOop)frame.opStack.pop();
+					LongOop longOop2 = (LongOop)frame.opStack.pop();
+					frame.opStack.push(new LongOop(longOop1.getValue() - longOop2.getValue()));
 				}
 				break;
 				case lushr: {
+					LongOop longOop1 = (LongOop)frame.opStack.pop();
+					LongOop longOop2 = (LongOop)frame.opStack.pop();
+					long op1 = longOop1.getValue();
+					long op2 = longOop2.getValue() & 0x3f;
+					long ret = op1>>>op2;
+
+					frame.opStack.push(new LongOop(ret));
 				}
 				break;
 				case lxor: {
+					LongOop longOop1 = (LongOop)frame.opStack.pop();
+					LongOop longOop2 = (LongOop)frame.opStack.pop();
+					long op1 = longOop1.getValue();
+					long op2 = longOop2.getValue();
+					long ret = op1 ^ op2;
+
+					frame.opStack.push(new LongOop(ret));
 				}
 				break;
 				case monitorenter: {
+					Oop oop = frame.opStack.pop();
+					oop.lock();
 				}
 				break;
 				case monitorexit: {
+					Oop oop = frame.opStack.pop();
+					oop.unlock();
 				}
 				break;
 				case multianewarray: {
+					//create a new array of dimensions dimensions
+
+					int index1 = codeArray[++frame.pc] & 0xff;
+					int index2 = codeArray[++frame.pc] & 0xff;
+					int index = ( index1 << 8 ) + index2;
+
+					String className = constant_pool[((ClassInfo)constant_pool[index]).name_index].toString();
+
+					int dimensions = codeArray[++frame.pc] & 0xff;
+
+					int[] dimArray = new int[dimensions];
+					for ( int i=0; i< dimensions; i++) {
+						IntegerOop sizeN = (IntegerOop)frame.opStack.pop();
+						dimArray[i] = sizeN.getValue();
+					}
+					//new int[3][2], dimArray is [2,3];
+					Oop array = vm.createMultiArray(className , dimArray);
+					frame.opStack.push(array);
 				}
 				break;
 				case i_new: {
@@ -1334,49 +1442,134 @@ public class ExecuteEngine {
 				}
 				break;
 				case newarray: {
+					int type = codeArray[++frame.pc] & 0xff;
+					IntegerOop sizeN = (IntegerOop)frame.opStack.pop();
+
+					Oop array = vm.createArray(type , sizeN.getValue());
+					frame.opStack.push(array);
 				}
 				break;
 				case nop: {
+					//no operation
 				}
 				break;
 				case pop: {
+					frame.opStack.pop();
 				}
 				break;
 				case pop2: {
+					Oop oop = frame.opStack.pop();
+					if( oop instanceof  DoubleOop || oop instanceof LongOop) {
+
+					} else {
+						frame.opStack.pop();
+					}
 				}
 				break;
 				case putfield: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					int index2 = codeArray[++frame.pc] & 0xff;
+					int index = ( index1 << 8 ) + index2;
+
+					CpInfo fieldRef = constant_pool[index];
+					assert fieldRef instanceof FieldRefInfo;
+					FieldRefInfo fieldRefInfo = (FieldRefInfo)fieldRef;
+
+					String className = constant_pool[((ClassInfo)constant_pool[fieldRefInfo.class_index]).name_index].toString();
+					String fieldName =  constant_pool[((NameAndTypeInfo)constant_pool[fieldRefInfo.name_and_type_index]).name_index].toString();
+					String description =  constant_pool[((NameAndTypeInfo)constant_pool[fieldRefInfo.name_and_type_index]).descriptor_index].toString();
+
+					Oop value = frame.opStack.pop();
+					Oop objectRef = frame.opStack.pop();
+					objectRef.putField(fieldName, value);
 				}
 				break;
 				case putstatic: {
+
+					int index1 = codeArray[++frame.pc] & 0xff;
+					int index2 = codeArray[++frame.pc] & 0xff;
+					int index = ( index1 << 8 ) + index2;
+
+					CpInfo fieldRef = constant_pool[index];
+					assert fieldRef instanceof FieldRefInfo;
+					FieldRefInfo fieldRefInfo = (FieldRefInfo)fieldRef;
+
+					String className = constant_pool[((ClassInfo)constant_pool[fieldRefInfo.class_index]).name_index].toString();
+					String fieldName =  constant_pool[((NameAndTypeInfo)constant_pool[fieldRefInfo.name_and_type_index]).name_index].toString();
+					String description =  constant_pool[((NameAndTypeInfo)constant_pool[fieldRefInfo.name_and_type_index]).descriptor_index].toString();
+					Oop value = frame.opStack.pop();
+					vm.putStatic(className, fieldName, description, value);
 				}
 				break;
 				case ret: {
+					int index1 = codeArray[++frame.pc] & 0xff;
+					if ( wideFlag ) {
+						index1 = (index1 <<8 ) + ( codeArray[++frame.pc] & 0xff);
+					}
+
+					IntegerOop address = (IntegerOop)frame.localVariable.get(index1);
+					frame.pc = address.getValue();
+					continue;
 				}
-				break;
 				case i_return: {
-					Oop returnValue = frame.opStack.pop();
 					frameStack.pop();
-					Frame currentFrame = frameStack.peek();
-					currentFrame.opStack.push(returnValue);
+					return;
 				}
-				break;
 				case saload: {
+					IntegerOop integerOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					Oop value = arrayOop.getValue(integerOop);
+					frame.opStack.push(value);
 				}
 				break;
 				case sastore: {
+					ShortOop shortOop = (ShortOop)frame.opStack.pop();
+					IntegerOop indexOop = (IntegerOop)frame.opStack.pop();
+					ArrayOop arrayOop = (ArrayOop)frame.opStack.pop();
+					arrayOop.setValue(indexOop, shortOop);
 				}
 				break;
 				case sipush: {
+					short value = ByteBuffer.wrap(new byte[]{codeArray[++frame.pc], codeArray[++frame.pc]}).getShort();
+					frame.opStack.push(new IntegerOop(value));
 				}
 				break;
 				case swap: {
+					Oop oop1 = frame.opStack.pop();
+					Oop oop2 = frame.opStack.pop();
+
+					frame.opStack.push(oop1);
+					frame.opStack.push(oop2);
+
 				}
 				break;
 				case tableswitch: {
+					IntegerOop index = (IntegerOop)frame.opStack.pop();
+					frame.pc +=4;
+					int defaultLabel = getOpCodeInt(codeArray, frame.pc);
+					frame.pc +=4;
+					int low = getOpCodeInt(codeArray, frame.pc);
+					frame.pc +=4;
+					int high = getOpCodeInt(codeArray, frame.pc);
+					frame.pc +=4;
+					int labelCount = high- low;
+					int [] labelArray = new int[labelCount];
+					for(int i=0; i< labelCount; i++){
+						labelArray[i] = getOpCodeInt(codeArray, frame.pc);
+						frame.pc +=4;
+					}
+
+					int i = index.getValue();
+					if( i < low || i > high) {
+						frame.pc += defaultLabel;
+					} else {
+						frame.pc += labelArray[i-low];
+					}
+					continue;
 				}
-				break;
 				case wide: {
+					wideFlag = true;
+
 				}
 				break;
 
@@ -1391,4 +1584,14 @@ public class ExecuteEngine {
 	private Oop convertConstPoolToOop(CpInfo cpInfo) {
 		return null;
 	}
+
+	private static int getOpCodeInt(byte []  opCode, int startIndex) {
+		return ByteBuffer.wrap(new byte[]{opCode[startIndex],opCode[startIndex+1]
+									,opCode[startIndex+2],opCode[startIndex+3]}).getInt();
+	}
+
+	private static short getOpCodeShort(byte []  opCode, int startIndex) {
+		return ByteBuffer.wrap(new byte[]{opCode[startIndex],opCode[startIndex+1]}).getShort();
+	}
+
 }

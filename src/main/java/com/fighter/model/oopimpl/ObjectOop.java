@@ -1,5 +1,8 @@
 package com.fighter.model.oopimpl;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.fighter.model.Klass;
 import com.fighter.model.Oop;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ObjectOop extends Oop {
+
+	private Lock monitorLock = new ReentrantLock();
 
 	public Klass klass;
 
@@ -29,5 +34,15 @@ public class ObjectOop extends Oop {
 	@Override
 	public Oop getField(String className, String fieldName, String description) {
 		return null;
+	}
+
+	@Override
+	public void lock() {
+		monitorLock.lock();
+	}
+
+	@Override
+	public void unlock() {
+		monitorLock.unlock();
 	}
 }

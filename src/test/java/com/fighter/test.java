@@ -1,7 +1,10 @@
 package com.fighter;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.text.NumberFormat;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -67,5 +70,20 @@ public class test {
     public void testVm() {
         VM vm = new VM();
         vm.execute("com.fighter.template.Main");
+    }
+
+    @Test
+    public void testShort() {
+        short a = -1;
+        int byteOne = (a & 0xff00) >> 8;
+        int byteTwo = a & 0xff;
+        System.out.println(byteTwo);
+
+        short c = (short)((byteOne <<8) | (byteTwo & 0xff));
+        System.out.println(c);
+
+        Object str= "";
+
+        String ccc= (String)str;
     }
 }
