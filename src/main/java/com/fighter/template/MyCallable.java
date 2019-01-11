@@ -5,5 +5,5 @@ package com.fighter.template;
  */
 public interface MyCallable {
 	public static final int ccc=222;
-	Object call()  throws Exception;
+	Object call(int a,int b,long c)  throws Exception;
 }

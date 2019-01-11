@@ -1,5 +1,6 @@
 package com.fighter.model.oopimpl;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.fighter.model.Klass;
@@ -10,10 +11,17 @@ import com.fighter.model.Oop;
  */
 public class ArrayOop extends BasicOop  {
 
-	private LinkedList<Oop> values;
+	private ArrayList<Oop> values;
+
+	public ArrayOop(int size ) {
+		values = new ArrayList(size);
+		for (int i=0; i< size; i++) {
+			values.add(null);
+		}
+	}
 
 	@Override
-	public void putField(String fieldName, Oop oop) {
+	public void putField(String className,String fieldName,String description, Oop oop) {
 
 	}
 

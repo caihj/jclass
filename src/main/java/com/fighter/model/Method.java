@@ -18,10 +18,13 @@ public class Method {
 
 	public int accessFlags;
 
-	public Method(MethodInfo method, ClassObject readClass) {
+	public Klass klass;
+
+	public Method(MethodInfo method, ClassObject readClass, Klass klass) {
 		name = readClass.constant_pool[method.name_index].toString();
 		descriptor = readClass.constant_pool[method.descriptor_index].toString();
 		accessFlags = method.access_flags;
+		this.klass = klass;
 
 		for(int j=0;j<method.attributes_count;j++){
 			AttributeInfo attr = method.attributes[j];

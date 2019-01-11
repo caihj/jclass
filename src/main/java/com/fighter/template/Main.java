@@ -9,12 +9,12 @@ public class Main {
     public static void main(String[] args) throws Exception {
         System.out.println("hello world");
 
-//        Callable c = new  DummyCallable();
-//
-//        c.call();
-//
-//        MyCallable m = new  DummyCallable();
-//
-//        m.call();
+
+        MyCallable m = new  DummyCallable();
+
+        m.call(10000,20000,3000);
+
+        BasicFoo basicFoo = new BasicFoo();
+        basicFoo.foo();
     }
 }

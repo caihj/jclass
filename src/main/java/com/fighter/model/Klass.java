@@ -16,6 +16,7 @@ import com.fighter.tools.types.Utils;
 import com.fighter.tools.types.attribute.ConstantValueAttribute;
 import com.fighter.tools.types.cpinfo.ClassInfo;
 import com.fighter.tools.types.cpinfo.IntegerInfo;
+import com.fighter.tools.types.cpinfo.InterfaceMethodInfo;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -98,9 +99,9 @@ public class Klass {
 			String m_desc = readClass.constant_pool[field.descriptor_index].toString();
 
 			if(Utils.fieldAccessFlags(field.access_flags).contains("static")){
-				staticFieldvalue.put(m_name + m_desc, initConstantValue(field));
+				staticFieldvalue.put(className + ":" + m_name + m_desc, initConstantValue(field));
 			} else {
-				OopfieldOffsetMap.put(m_name + m_desc, fieldIndex ++ );
+				OopfieldOffsetMap.put( className + ":" + m_name + m_desc, fieldIndex ++ );
 			}
 
 		}
@@ -108,14 +109,14 @@ public class Klass {
 		for (MethodInfo method : readClass.methods) {
 			String m_name = readClass.constant_pool[method.name_index].toString();
 			String m_desc = readClass.constant_pool[method.descriptor_index].toString();
-			Method m = new Method(method, readClass);
+			Method m = new Method(method, readClass, this);
 			m.accessFlags = method.access_flags;
-			vTableMap.put(m_name + m_desc, m);
+			vTableMap.put(className + ":" +  m_name + m_desc, m);
 		}
 	}
 
-	public Method getMethod(String name, String description) {
-		return vTableMap.get( name + description );
+	public Method getMethod(String className, String name, String description) {
+		return vTableMap.get(className + ":" + name + description );
 	}
 
 	private Oop initConstantValue(FieldInfo field) {
@@ -151,6 +152,10 @@ public class Klass {
 	}
 
 	public Oop getStaticField(String fieldName, String description) {
-		return staticFieldvalue.get(fieldName + description);
+		return staticFieldvalue.get(className + ":" + fieldName + description);
+	}
+
+	public Integer getOopFieldOffset(String className, String fieldName, String description) {
+		return OopfieldOffsetMap.get(className + ":" + fieldName + description);
 	}
 }

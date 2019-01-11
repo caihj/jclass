@@ -22,8 +22,14 @@ public class ObjectOop extends Oop {
 	public Oop [] field;
 
 	@Override
-	public void putField(String fieldName, Oop oop) {
+	public void putField(String className,String fieldName,String description, Oop oop) {
 
+		Integer index = klass.getOopFieldOffset(className, fieldName,description);
+		if(index == null){
+			log.error("filed not found {},{},{}", className, fieldName, description);
+		}
+
+		field[index] = oop;
 	}
 
 	@Override
@@ -33,7 +39,12 @@ public class ObjectOop extends Oop {
 
 	@Override
 	public Oop getField(String className, String fieldName, String description) {
-		return null;
+		Integer index = klass.getOopFieldOffset(className, fieldName,description);
+		if(index == null){
+			log.error("filed not found {},{},{}", className, fieldName, description);
+		}
+
+		return field[index];
 	}
 
 	@Override

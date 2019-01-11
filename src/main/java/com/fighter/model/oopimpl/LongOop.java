@@ -14,7 +14,7 @@ public class LongOop extends BasicOop  {
 	}
 
 	@Override
-	public void putField(String fieldName, Oop oop) {
+	public void putField(String className,String fieldName,String description, Oop oop) {
 
 	}
 

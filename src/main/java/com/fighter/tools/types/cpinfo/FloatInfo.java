@@ -9,6 +9,7 @@ import java.io.IOException;
 public class FloatInfo extends CpInfo {
     //u4
     float bytes;
+
     public FloatInfo(int tag, DataInput in) {
         super(tag);
         try {
@@ -16,5 +17,9 @@ public class FloatInfo extends CpInfo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public float getValue() {
+        return bytes;
     }
 }

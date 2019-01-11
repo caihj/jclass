@@ -1,9 +1,11 @@
 package com.fighter.vm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import com.fighter.classloader.BootStrapClassLoader;
 import com.fighter.constant.ClassName;
@@ -12,7 +14,9 @@ import com.fighter.model.Klass;
 import com.fighter.model.Method;
 import com.fighter.model.Oop;
 import com.fighter.model.oopimpl.ArrayOop;
+import com.fighter.model.oopimpl.DoubleOop;
 import com.fighter.model.oopimpl.IntegerOop;
+import com.fighter.model.oopimpl.LongOop;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -46,7 +50,7 @@ public class VM {
 			return;
 		}
 
-		Method method = klass.getMethod(methodName, description);
+		Method method = klass.getMethod(className, methodName, description);
 
 		if( method == null ){
 			log.error(" method not found " + className);
@@ -66,9 +70,6 @@ public class VM {
 		executeEngine.execute(frame, this);
 	}
 
-	void executeMethod(Oop oop, String methodName, String description) {
-
-	}
 
 	public Oop getStaticFiled(String className, String fieldName, String description) {
 		Klass klass = bootStrapClassLoader.loadClass(className);
@@ -82,7 +83,7 @@ public class VM {
 		//call clinit
 		executeMethod(className, Constant.CINIT, Constant.descripton);
 		//call init
-		executeMethod(oop, Constant.INIT, Constant.descripton);
+		//executeMethod(oop, Constant.INIT, Constant.descripton);
 
 		return oop;
 	}
@@ -122,14 +123,174 @@ public class VM {
 	 int 	 10
 	 long 	 11
 	 * @param type
-	 * @param value
+	 * @param size
 	 * @return
 	 */
 
-	public Oop createArray(int type, int value) {
-		return null;
+	public Oop createArray(int type, int size) {
+		return new ArrayOop(size);
 	}
 
 	public void putStatic(String className, String fieldName, String description, Oop value) {
+	}
+
+	/**
+	 *
+	 * @param className
+	 * @param methodName
+	 * @param description
+	 * @param arg arg array, foo.call(1,2,3,4) arg is [4,3,2,1,foo]
+	 * @return
+	 */
+	public Oop invokeInterface(String className, String methodName, String description, Oop[] arg) {
+		Oop thisObj =  arg[arg.length-1];
+
+		Klass klass = thisObj.getKlass();
+		Method method = klass.getMethod(className, methodName, description);
+
+		Frame frame = new Frame();
+		frame.localVariable = new ArrayList<>(method.codeAttribute.max_locals);
+		for(int i=0;i <method.codeAttribute.max_locals;i++){
+			frame.localVariable.add(null);
+		}
+
+		//init localVariable
+		//this
+		frame.localVariable.set(0,thisObj);
+
+		int i=1;
+		for(int j = arg.length -1; j>=0; j--){
+			Oop oop = arg[j];
+			frame.localVariable.set(i++, oop);
+			if( oop instanceof LongOop || oop instanceof DoubleOop){
+				i++;
+			}
+		}
+
+		frame.opStack = new Stack<>();
+		frame.currentMethod = method;
+		frame.pc = 0;
+		frame.currentKlass = klass;
+
+		return executeEngine.execute(frame, this);
+	}
+
+	/**
+	 *
+	 * @param className
+	 * @param methodName
+	 * @param description
+	 * @param arg arg array, foo.call(1,2,3,4) arg is [1,2,3,4,foo]
+	 * @return
+	 */
+	public Oop invokeVirtual(String className, String methodName, String description, Oop[] arg) {
+
+		Oop thisObj =  arg[arg.length-1];
+
+		Klass klass = thisObj.getKlass();
+		Method method = klass.getMethod(className, methodName, description);
+
+		Frame frame = new Frame();
+		frame.localVariable = new ArrayList<>(method.codeAttribute.max_locals);
+		for(int i=0;i <method.codeAttribute.max_locals;i++){
+			frame.localVariable.add(null);
+		}
+
+		//init localVariable
+		//this
+		frame.localVariable.set(0,thisObj);
+
+		int i=1;
+		for(int j=0; j< arg.length -1; j++){
+			Oop oop = arg[j];
+			frame.localVariable.set(i++, oop);
+			if( oop instanceof LongOop || oop instanceof DoubleOop){
+				i++;
+			}
+		}
+
+		frame.opStack = new Stack<>();
+		frame.currentMethod = method;
+		frame.pc = 0;
+		frame.currentKlass = klass;
+
+		return executeEngine.execute(frame, this);
+	}
+	/**
+	 *
+	 * @param className
+	 * @param methodName
+	 * @param description
+	 * @param arg arg array, foo.call(1,2,3,4) arg is [4,3,2,1]
+	 * @return
+	 */
+	public Oop invokeStatic(String className, String methodName, String description, Oop[] arg) {
+		Klass klass = bootStrapClassLoader.loadClass(className);
+		Method method = klass.getMethod(className, methodName, description);
+
+		Frame frame = new Frame();
+		frame.localVariable = new ArrayList<>(method.codeAttribute.max_locals);
+		for(int i=0;i <method.codeAttribute.max_locals;i++){
+			frame.localVariable.add(null);
+		}
+
+		int i=0;
+		for(int j = arg.length -1; j>=0; j--){
+			Oop oop = arg[j];
+			frame.localVariable.set(i++, oop);
+			if( oop instanceof LongOop || oop instanceof DoubleOop){
+				i++;
+			}
+		}
+
+		frame.opStack = new Stack<>();
+		frame.currentMethod = method;
+		frame.pc = 0;
+		frame.currentKlass = klass;
+
+		return executeEngine.execute(frame, this);
+
+	}
+
+	/**
+	 *
+	 * @param className
+	 * @param methodName
+	 * @param description
+	 * @param arg arg arg array, foo.call(1,2,3,4) arg is [4,3,2,1,foo]
+	 * @return
+	 */
+	public Oop invokeSpecial(String className, String methodName, String description, Oop[] arg) {
+
+		Oop thisObj =  arg[arg.length-1];
+
+		Klass klass = thisObj.getKlass();
+		Method method = klass.getMethod(className, methodName, description);
+
+		Frame frame = new Frame();
+		frame.localVariable = new ArrayList<>(method.codeAttribute.max_locals);
+		for(int i=0;i <method.codeAttribute.max_locals;i++){
+			frame.localVariable.add(null);
+		}
+
+		//init localVariable
+		//this
+		frame.localVariable.set(0,thisObj);
+
+		int i=1;
+		for(int j = arg.length - 2; j>=0; j--){
+			Oop oop = arg[j];
+			frame.localVariable.set(i++, oop);
+			if( oop instanceof LongOop || oop instanceof DoubleOop){
+				i++;
+			}
+		}
+
+		frame.opStack = new Stack<>();
+		frame.currentMethod = method;
+		frame.pc = 0;
+		frame.currentKlass = method.klass;
+
+		return executeEngine.execute(frame, this);
 	}
 }
